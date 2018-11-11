@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}
+Digi-Pay
+{% endblock %}
+{% block content %}
+<form class="form-signin" method="POST" action="{{ url_for('signup') }}">  
+	<br>
+	<div class="form-group">
+		<div class="row">
+			<div class="col-xs-3">
+				<label>Name:</label>
+				<input type="text" name="Name" id = "text"  placeholder="Name" required class="form-control"><br>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-3">
+				<label>Email:</label>
+				<input type="email" name="email" id = "email"  placeholder="Email" required class="form-control"><br>		
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-3">
+				<label>Username:</label>
+				<input type="text" name="uname" id = "uname"  placeholder="User Name" required class="form-control"><br>		
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-3">
+				<label>Password:</label>
+				<input type="password" name="pwd" id="pwd" placeholder="Password" required class="form-control"><br>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-3">
+				<label>Confirm Password:</label>
+				<input type="password" name="confirmpwd" id="confirmpwd" placeholder="Password" required class="form-control"><br><br>
+			</div>
+		</div>
+		{% include 'flash.html' %}
+		<button type="submit" id="enter"  class="btn btn-primary btn-group btn-group-lg mb-3">Submit</button>
+	</div>	
+</form>
+<script type="text/javascript">
+	var password = document.getElementById("pwd"), confirm_password = document.getElementById("confirmpwd");
+	document.getElementById("enter").disabled = true;
+	function validatePassword(){
+		if(password.value != confirm_password.value) {
+			document.getElementById("enter").disabled = true;
+		} else {
+			document.getElementById("enter").disabled = false;
+		}
+	}
+
+password.onchange = validatePassword;
+confirm_password.onkeyup = validatePassword;
+  </script>
+{% endblock %}

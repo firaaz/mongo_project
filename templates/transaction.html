@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}
+Digi-Pay
+{% endblock %}
+{% block content %}
+<form class="form-payment" method="POST" action="/payment">
+        Amount:
+        <input type= = "text" name="amount" id = "amount" class="form-control">
+
+        Reciepient ID:
+        <input type= = "email" name="r_id" id = "r_id" class="form-control">
+
+        Description:
+        <input type= = "text" name="desc" id = "desc" class="form-control">
+        <br>
+        {% include 'flash.html' %}
+        <button type="submit" id="enter"  class="btn btn-primary btn-group btn-group-lg mb-3 w3-margin-top w3-margin-bottom">Submit</button>
+</form>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+Digi-Pay
+{% endblock %}
+{% block content %}
+<h1>Welcome to Digi-Pay</h1>
+
+<div class="container">
+<center><div class="square"><span class="cont"><a href="user_info">User Info</a></span></div></center>
+<center><div class="square"><span class="cont"><a href="balance">Add balance</a></span></div></center>
+<center><div class="square"><span class="cont"><a href="payment">Payments</a></span></div></center>
+<center><div class="square"><span class="cont"><a href="user_contact">User Contacts</a></span></div></center>
+{% include 'flash.html' %}
+<!-- <div id="square"></div> -->
+</div>
+{% endblock %}

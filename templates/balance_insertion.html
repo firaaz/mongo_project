@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}
+Digi-Pay
+{% endblock %}
+{% block content %}
+<form class="form-balance" method="POST" action="/balance"> 
+        Add amount:
+        <input type= = "text" name="amount" id = "amount" class="form-control">
+
+        Card Number:
+        <input type= = "text" name="c_no" id = "c_no" class="form-control">
+
+        OTP:
+        <input type= = "text" name="OTP" id = "OTP" class="form-control">
+  
+
+    <button type="submit" id="enter"  class="btn btn-primary btn-group btn-group-lg mb-3 w3-margin-top w3-margin-bottom">Submit</button>
+    <div class="w3-padding w3-white notranslate">
+    <div class="table-responsive">
+        <h1>Last Balance Added</h1>
+    <table class="table table-hover table-striped">
+        <tr>
+            <th>Username</th>
+            <th>Amount</th>
+            <th>Card Number</th>
+            <th>Date</th>
+        </tr>
+        {% for balance_list in balance_list1 %}
+        <tr>
+            <td>{{ balance_list['Username'] }}</td>
+            <td>{{ balance_list['Amount'] }}</td>
+            <td>{{ balance_list['C_no'] }}</td>
+            <td>{{ balance_list['Date'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
+    </div>
+
+</form>
+{% endblock %}

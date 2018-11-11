@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}
+Digi-Pay
+{% endblock %}
+{% block content %}
+
+<h1> Sign In </h1>
+
+<form class="form-signin" method="POST" action="{{ url_for('signin') }}">
+    <div class="row">
+      <div class="col-xs-3">
+          <label>Email id:</label>
+          <input type="email" name="email" placeholder="email" class="form-control"><br>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-3">
+          <label>Password:</label>
+          <input type="password" name="password" placeholder="password" class="form-control"><br>
+        </div>
+      </div>
+      {% include 'flash.html' %}
+    <button type="submit" id="enter"  class="btn btn-primary" >Sign In</button>
+    </form>
+
+    <form class="form-signup" action="/signup">
+    <div class="row">
+        <div class="col-xs-3">
+            <label>Not Registered ?</label>
+                <button type="submit" id="go-signup"  class="btn btn-light" ><a href="signup">Sign Up </a> </button>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
+

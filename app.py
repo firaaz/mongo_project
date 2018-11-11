@@ -64,10 +64,13 @@ def add_balance():
 def transaction():
     if request.method == "POST":
         if mongo.db.total.find_one({'Email' : request.form['r_id']}) is None:
-            flash("User does not exist", "danger")
-            return redirect(url_for("transaction"))
+            if mongo.db.users.find_one({'Email' : request.form['r_id']}) is None:
+                flash("User does not exist", "danger")
+                return redirect(url_for("transaction"))
+            else:
+                total.insert_one({'Email' : request.form['r_id'], "Total_bal" : 0})
         transaction_db = mongo.db.transaction
-        transaction_db.insert({'sender': session['Email'], 'recipient': request.form['r_id'], 'value': request.form['amount'], 'description': request.form['desc'],'date': datetime.datetime.now()})
+        transaction_db.insert({'sender': session['Email'], 'recipient': request.form['r_id'], 'value': int(request.form['amount']), 'description': request.form['desc'],'date': datetime.datetime.now()})
         sender_bal = int(mongo.db.total.find_one({'Email' : session['Email']})['Total_bal'])
         sender_bal = sender_bal - int(request.form['amount'])
         mongo.db.total.replace_one({'Email':session['Email']}, {'Email' : session['Email'], 'Total_bal' : sender_bal}, upsert=False)

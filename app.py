@@ -44,9 +44,9 @@ def signup():
 
 @app.route("/balance", methods=['POST', 'GET'])
 def add_balance():
+    total = mongo.db.total
     balance = mongo.db.balance
     if request.method == 'POST':
-        total = mongo.db.total
         balance.insert({'Username' : session['Username'], 'Email' : session['Email'], 'Amount' : request.form['amount'], "C_no" : request.form['c_no'], "Date" : datetime.datetime.now()})
         new_entry = total.find_one({'Email' : session['Email']})
         if new_entry:
@@ -57,11 +57,14 @@ def add_balance():
             total.insert_one({'Email' : session['Email'], "Total_bal" : request.form['amount']})
         flash("Added amount successfully", "success")
         return redirect(url_for('selection_page'))    
-    return render_template("balance_insertion.html", balance_list1 = balance.find({'Email': session['Email']}))
+    return render_template("balance_insertion.html", balance_list1 = balance.find({'Email': session['Email']}), 
+                           total_balance = total.find_one({'Email': session['Email']}))
 
 
 @app.route("/payment", methods=['GET', 'POST'])
 def transaction():
+    transaction_db = mongo.db.transaction
+    total = mongo.db.total
     if request.method == "POST":
         if mongo.db.total.find_one({'Email' : request.form['r_id']}) is None:
             if mongo.db.users.find_one({'Email' : request.form['r_id']}) is None:
@@ -69,7 +72,6 @@ def transaction():
                 return redirect(url_for("transaction"))
             else:
                 total.insert_one({'Email' : request.form['r_id'], "Total_bal" : 0})
-        transaction_db = mongo.db.transaction
         transaction_db.insert({'sender': session['Email'], 'recipient': request.form['r_id'], 'value': int(request.form['amount']), 'description': request.form['desc'],'date': datetime.datetime.now()})
         sender_bal = int(mongo.db.total.find_one({'Email' : session['Email']})['Total_bal'])
         sender_bal = sender_bal - int(request.form['amount'])
@@ -80,7 +82,9 @@ def transaction():
         flash("Payment successful", "success")
         return redirect(url_for('selection_page'))
         # do the updating of both the databases
-    return render_template("transaction.html")
+    return render_template("transaction.html", transaction_sender_list = transaction_db.find({"sender": session['Email']}),
+                           total_balance = total.find_one({"Email": session['Email']}),
+                           transaction_recv_list = transaction_db.find({'recipient': session['Email']}))
 
 @app.route("/user_info", methods = ['GET', 'POST'])
 def user_info():

@@ -5,16 +5,43 @@ Digi-Pay
 {% endblock %}
 {% block content %}
 <form class="form-payment" method="POST" action="/payment">
-        Amount:
-        <input type= = "text" name="amount" id = "amount" class="form-control">
+    Amount:
+    <input type= = "text" name="amount" id = "amount" class="form-control">
 
-        Reciepient ID:
-        <input type= = "email" name="r_id" id = "r_id" class="form-control">
+    Reciepient ID:
+    <input type= = "email" name="r_id" id = "r_id" class="form-control">
 
-        Description:
-        <input type= = "text" name="desc" id = "desc" class="form-control">
-        <br>
-        {% include 'flash.html' %}
-        <button type="submit" id="enter"  class="btn btn-primary btn-group btn-group-lg mb-3 w3-margin-top w3-margin-bottom">Submit</button>
+    Description:
+    <input type= = "text" name="desc" id = "desc" class="form-control">
+    <br>
+    {% include 'flash.html' %}
+    <button type="submit" id="enter"  class="btn btn-primary btn-group btn-group-lg mb-3 w3-margin-top w3-margin-bottom">Submit</button>
+    <div class="w3-padding w3-white notranslate">
+        <div class="table-responsive">
+            <h3><p> Present balance: {{ total_balance['Total_bal'] }} </p></h3>
+            <h1>Last Transactions</h1>
+            <table class="table table-hover table-striped">
+                <tr>
+                    <th>Sender</th>
+                    <th>Reciever</th>
+                    <th>Amount</th>
+                </tr>
+                {% for sender in transaction_sender_list %}
+                <tr>
+                    <td>{{ sender['sender'] }}</td>
+                    <td>{{ sender['recipient'] }}</td>
+                    <td>{{ sender['amount'] }}</td>
+                </tr>
+                {% endfor %}
+                {% for recv in transaction_recv_list %}
+                <tr>
+                    <td>{{ recv['sender'] }}</td>
+                    <td>{{ recv['recipient'] }}</td>
+                    <td>{{ recv['amount'] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
 </form>
 {% endblock %}

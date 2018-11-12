@@ -4,29 +4,32 @@ import bcrypt
 import datetime
 from functools import wraps
 
+# Initialize Flask
 app = Flask(__name__)
 
+# MongoDb Configuration
 app.config["MONGO_DBNAME"] = "Digipay"
 app.config["MONGO_URI"] = "mongodb://localhost:27017/Digipay"
 mongo = PyMongo(app)
 
-#Check is session.logged_in is True
+# Check is session.logged_in is True
 def is_logged_in(f):
-	@wraps(f)
-	def wrap(*args, **kwargs):
-		if 'logged_in' in session:
-			return f(*args, **kwargs)
-		else:
-			flash('Please Log in First', 'danger')
-			return redirect(url_for('signin'))
-	return wrap
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Please Log in first', 'danger')
+            return redirect(url_for('signin'))
+    return wrap
 
-
+# Landing page after signing in to choose the different services
 @app.route("/selection_page")
 @is_logged_in
 def selection_page():
     return render_template("selection_page.html")
 
+# First page/Sign-in page
 @app.route("/", methods=['POST', 'GET'])
 @app.route("/signin", methods=['POST', 'GET'])
 def signin():
@@ -43,6 +46,7 @@ def signin():
             return redirect(url_for('signin'))
     return render_template("signin.html")
 
+# User sign-up page
 @app.route("/signup", methods=['POST','GET'])
 def signup():
     if request.method == 'POST':
@@ -57,6 +61,7 @@ def signup():
         return redirect(url_for('signup'))
     return render_template("signup.html")   
 
+# Check and add balance to account
 @app.route("/balance", methods=['POST', 'GET'])
 @is_logged_in
 def add_balance():
@@ -76,7 +81,7 @@ def add_balance():
     return render_template("balance_insertion.html", balance_list1 = balance.find({'Email': session['Email']}), 
                            total_balance = total.find_one({'Email': session['Email']}))
 
-
+# Send money to another account
 @app.route("/payment", methods=['GET', 'POST'])
 @is_logged_in
 def transaction():
@@ -103,18 +108,21 @@ def transaction():
                            total_balance = total.find_one({"Email": session['Email']}),
                            transaction_recv_list = transaction_db.find({'recipient': session['Email']}))
 
+# Display current user's information
 @app.route("/user_info", methods = ['GET', 'POST'])
 @is_logged_in
 def user_info():
     users = mongo.db.users
     return render_template("user_info.html", curr_user = users.find({'Email': session['Email']}))
 
+# Display all users's information
 @app.route("/user_contact")
 @is_logged_in
 def user_contact():
     users = mongo.db.users
     return render_template("user_contact.html", curr_user = users.find())
 
+# Delete current user
 @app.route("/user_delete", methods = ['GET', 'POST'])
 @is_logged_in
 def delete_user():
@@ -123,6 +131,7 @@ def delete_user():
     mongo.db.total.delete_one({"Email" : session['Email']})
     return render_template("user_delete.html")
 
+# Sign out route
 @app.route("/signout")
 def signout():
     session.clear()

@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, redirect, request, session, f
 from flask_pymongo import PyMongo
 import bcrypt
 import datetime
+from functools import wraps
 
 app = Flask(__name__)
 
@@ -9,7 +10,20 @@ app.config["MONGO_DBNAME"] = "Digipay"
 app.config["MONGO_URI"] = "mongodb://localhost:27017/Digipay"
 mongo = PyMongo(app)
 
+#Check is session.logged_in is True
+def is_logged_in(f):
+	@wraps(f)
+	def wrap(*args, **kwargs):
+		if 'logged_in' in session:
+			return f(*args, **kwargs)
+		else:
+			flash('Please Log in First', 'danger')
+			return redirect(url_for('signin'))
+	return wrap
+
+
 @app.route("/selection_page")
+@is_logged_in
 def selection_page():
     return render_template("selection_page.html")
 
@@ -23,6 +37,7 @@ def signin():
             if bcrypt.hashpw(request.form['password'].encode('utf-8'), login_user['Password']) == login_user['Password']:
                 session['Username'] = login_user['Username']
                 session['Email'] = request.form['email']
+                session['logged_in'] = True
                 return redirect(url_for('selection_page'))
             flash("Incorrect email/password", 'danger')
             return redirect(url_for('signin'))
@@ -43,6 +58,7 @@ def signup():
     return render_template("signup.html")   
 
 @app.route("/balance", methods=['POST', 'GET'])
+@is_logged_in
 def add_balance():
     total = mongo.db.total
     balance = mongo.db.balance
@@ -62,6 +78,7 @@ def add_balance():
 
 
 @app.route("/payment", methods=['GET', 'POST'])
+@is_logged_in
 def transaction():
     transaction_db = mongo.db.transaction
     total = mongo.db.total
@@ -87,16 +104,19 @@ def transaction():
                            transaction_recv_list = transaction_db.find({'recipient': session['Email']}))
 
 @app.route("/user_info", methods = ['GET', 'POST'])
+@is_logged_in
 def user_info():
     users = mongo.db.users
     return render_template("user_info.html", curr_user = users.find({'Email': session['Email']}))
 
 @app.route("/user_contact")
+@is_logged_in
 def user_contact():
     users = mongo.db.users
     return render_template("user_contact.html", curr_user = users.find())
 
 @app.route("/user_delete", methods = ['GET', 'POST'])
+@is_logged_in
 def delete_user():
     users = mongo.db.users
     users.delete_one({"Email": session['Email']})

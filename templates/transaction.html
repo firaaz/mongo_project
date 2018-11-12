@@ -25,19 +25,25 @@ Digi-Pay
                     <th>Sender</th>
                     <th>Reciever</th>
                     <th>Amount</th>
+                    <th>Date</th>
+                    <th>Description</th>
                 </tr>
                 {% for sender in transaction_sender_list %}
                 <tr>
                     <td>{{ sender['sender'] }}</td>
                     <td>{{ sender['recipient'] }}</td>
-                    <td>{{ sender['amount'] }}</td>
+                    <td>{{ sender['value'] }}</td>
+                    <td>{{ sender['date'] }}</td>
+                    <td>{{ sender['description'] }}</td>
                 </tr>
                 {% endfor %}
                 {% for recv in transaction_recv_list %}
                 <tr>
                     <td>{{ recv['sender'] }}</td>
                     <td>{{ recv['recipient'] }}</td>
-                    <td>{{ recv['amount'] }}</td>
+                    <td>{{ recv['value'] }}</td>
+                    <td>{{ recv['date'] }}</td>
+                    <td>{{ recv['description'] }}</td>
                 </tr>
                 {% endfor %}
             </table>

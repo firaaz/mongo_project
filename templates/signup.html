@@ -45,6 +45,12 @@ Digi-Pay
 	var password = document.getElementById("pwd"), confirm_password = document.getElementById("confirmpwd");
 	document.getElementById("enter").disabled = true;
 	function validatePassword(){
+		if(password.value.length < 5){
+			password.setCustomValidity("Password length should be minimum 5 characters")
+		}
+		else{
+			password.setCustomValidity("");
+		}
 		if(password.value != confirm_password.value) {
 			document.getElementById("enter").disabled = true;
 		} else {

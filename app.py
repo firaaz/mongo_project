@@ -37,7 +37,8 @@ def signin():
         users = mongo.db.users
         login_user = users.find_one({'Email' : request.form['email']})
         if login_user: 
-            if bcrypt.hashpw(request.form['password'].encode('utf-8'), login_user['Password']) == login_user['Password']:
+            if bcrypt.hashpw(request.form['password'].encode('utf-8'),
+                             login_user['Password']) == login_user['Password']:
                 session['Username'] = login_user['Username']
                 session['Email'] = request.form['email']
                 session['logged_in'] = True
@@ -54,7 +55,9 @@ def signup():
         existing_user = users.find_one({'Email' : request.form['email']})
         if existing_user is None:
             hashpassword = bcrypt.hashpw(request.form['pwd'].encode('utf-8'), bcrypt.gensalt())
-            users.insert({'Name' : request.form['Name'], 'Email' : request.form['email'], 'Username' : request.form['uname'], 'Password' : hashpassword, })
+            users.insert({'Name' : request.form['Name'],
+                          'Email' : request.form['email'], 'Username' : request.form['uname'],
+                          'Password' : hashpassword, })
             flash("SignUp successful, please login", 'success')
             return redirect(url_for('signin'))
         flash("User already exists", 'danger')
@@ -68,7 +71,9 @@ def add_balance():
     total = mongo.db.total
     balance = mongo.db.balance
     if request.method == 'POST':
-        balance.insert({'Username' : session['Username'], 'Email' : session['Email'], 'Amount' : request.form['amount'], "C_no" : request.form['c_no'], "Date" : datetime.datetime.now()})
+        balance.insert({'Username' : session['Username'], 'Email' : session['Email'],
+                        'Amount' : request.form['amount'], "C_no" : request.form['c_no'],
+                        "Date" : datetime.datetime.now()})
         new_entry = total.find_one({'Email' : session['Email']})
         if new_entry:
             bal = int(new_entry['Total_bal'])
@@ -94,7 +99,8 @@ def transaction():
                 return redirect(url_for("transaction"))
             else:
                 total.insert_one({'Email' : request.form['r_id'], "Total_bal" : 0})
-        transaction_db.insert({'sender': session['Email'], 'recipient': request.form['r_id'], 'value': int(request.form['amount']), 'description': request.form['desc'],'date': datetime.datetime.now()})
+        transaction_db.insert({'sender': session['Email'], 'recipient': request.form['r_id'],
+                               'value': int(request.form['amount']), 'description': request.form['desc'],'date': datetime.datetime.now()})
         sender_bal = int(mongo.db.total.find_one({'Email' : session['Email']})['Total_bal'])
         sender_bal = sender_bal - int(request.form['amount'])
         mongo.db.total.replace_one({'Email':session['Email']}, {'Email' : session['Email'], 'Total_bal' : sender_bal}, upsert=False)

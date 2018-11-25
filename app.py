@@ -73,7 +73,9 @@ def add_balance():
     card = mongo.db.card
     if request.method == 'POST':
         card_find = card.find_one({'C_no' : request.form['c_no'], 'PIN' : request.form['PIN']})
-        if card_find is not None:
+        if card_find is None:
+            flash("Card Number or PIN wrong, please try again with proper details", "danger")
+        else:
             balance.insert({'Username' : session['Username'], 'Email' : session['Email'], 'Amount' : request.form['amount'], "C_no" : request.form['c_no'],
                             "Date" : datetime.datetime.now()})
             new_entry = total.find_one({'Email' : session['Email']})
@@ -84,9 +86,7 @@ def add_balance():
             else:
                 total.insert_one({'Email' : session['Email'], "Total_bal" : request.form['amount']})
             flash("Added amount successfully", "success")
-        else:
-            flash("Card Number or PIN wrong, please try again with proper details", "danger")
-        return redirect(url_for('selection_page'))    
+        return redirect(url_for('selection_page'))
     return render_template("balance_insertion.html", balance_list1 = balance.find({'Email': session['Email']}), 
                            total_balance = total.find_one({'Email': session['Email']}))
 

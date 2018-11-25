@@ -73,8 +73,7 @@ def add_balance():
     card = mongo.db.card
     if request.method == 'POST':
         card_find = card.find_one({'C_no' : int(request.form['C_no'])})
-        print(card_find['C_no'])
-        if card_find and card_find['PIN'] == int(request.form['PIN']):
+        if card_find and int(card_find['PIN']) == int(request.form['PIN']):
             balance.insert({'Username' : session['Username'], 'Email' : session['Email'],
                             'Amount' : request.form['amount'], "C_no" : request.form['C_no'],
                             "Date" : datetime.datetime.now()})
@@ -105,16 +104,20 @@ def transaction():
                 return redirect(url_for("transaction"))
             else:
                 total.insert_one({'Email' : request.form['r_id'], "Total_bal" : 0})
-        transaction_db.insert({'sender': session['Email'], 'recipient': request.form['r_id'],
-                               'value': int(request.form['amount']), 'description': request.form['desc'],'date': datetime.datetime.now()})
         sender_bal = int(mongo.db.total.find_one({'Email' : session['Email']})['Total_bal'])
         sender_bal = sender_bal - int(request.form['amount'])
-        mongo.db.total.replace_one({'Email':session['Email']}, {'Email' : session['Email'], 'Total_bal' : sender_bal}, upsert=False)
-        recv_bal = int(mongo.db.total.find_one({'Email' : request.form['r_id']})['Total_bal'])
-        recv_bal = recv_bal + int(request.form['amount'])
-        mongo.db.total.replace_one({'Email':request.form['r_id']}, {'Email' : request.form['r_id'], 'Total_bal' : recv_bal}, upsert=False)
-        flash("Payment successful", "success")
-        return redirect(url_for('selection_page'))
+        if sender_bal <= 0:
+            flash("Not enough balance", "danger")
+            return redirect(url_for("transaction"))
+        else:
+            transaction_db.insert({'sender': session['Email'], 'recipient': request.form['r_id'],
+                                'value': int(request.form['amount']), 'description': request.form['desc'],'date': datetime.datetime.now()})
+            mongo.db.total.replace_one({'Email':session['Email']}, {'Email' : session['Email'], 'Total_bal' : sender_bal}, upsert=False)
+            recv_bal = int(mongo.db.total.find_one({'Email' : request.form['r_id']})['Total_bal'])
+            recv_bal = recv_bal + int(request.form['amount'])
+            mongo.db.total.replace_one({'Email':request.form['r_id']}, {'Email' : request.form['r_id'], 'Total_bal' : recv_bal}, upsert=False)
+            flash("Payment successful", "success")
+            return redirect(url_for('selection_page'))
         # do the updating of both the databases
     return render_template("transaction.html", transaction_sender_list = transaction_db.find({"sender": session['Email']}),
                            total_balance = total.find_one({"Email": session['Email']}),

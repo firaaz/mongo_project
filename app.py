@@ -70,18 +70,22 @@ def signup():
 def add_balance():
     total = mongo.db.total
     balance = mongo.db.balance
+    card = mongo.db.card
     if request.method == 'POST':
-        balance.insert({'Username' : session['Username'], 'Email' : session['Email'],
-                        'Amount' : request.form['amount'], "C_no" : request.form['c_no'],
-                        "Date" : datetime.datetime.now()})
-        new_entry = total.find_one({'Email' : session['Email']})
-        if new_entry:
-            bal = int(new_entry['Total_bal'])
-            bal = bal + int(request.form['amount'])
-            total.replace_one({'Email':session['Email']}, {'Email' : session['Email'], 'Total_bal' : bal}, upsert=False)
+        card_find = card.find_one({'C_no' : request.form['c_no'], 'PIN' : request.form['PIN']})
+        if card_find is not None:
+            balance.insert({'Username' : session['Username'], 'Email' : session['Email'], 'Amount' : request.form['amount'], "C_no" : request.form['c_no'],
+                            "Date" : datetime.datetime.now()})
+            new_entry = total.find_one({'Email' : session['Email']})
+            if new_entry:
+                bal = int(new_entry['Total_bal'])
+                bal = bal + int(request.form['amount'])
+                total.replace_one({'Email':session['Email']}, {'Email' : session['Email'], 'Total_bal' : bal}, upsert=False)
+            else:
+                total.insert_one({'Email' : session['Email'], "Total_bal" : request.form['amount']})
+            flash("Added amount successfully", "success")
         else:
-            total.insert_one({'Email' : session['Email'], "Total_bal" : request.form['amount']})
-        flash("Added amount successfully", "success")
+            flash("Card Number or PIN wrong, please try again with proper details", "danger")
         return redirect(url_for('selection_page'))    
     return render_template("balance_insertion.html", balance_list1 = balance.find({'Email': session['Email']}), 
                            total_balance = total.find_one({'Email': session['Email']}))

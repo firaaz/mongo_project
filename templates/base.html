@@ -23,10 +23,14 @@
         <!--[if lt IE 8]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-
+            {% if session['Username']%}
+            {% set var = "/selection_page"%}
+            {% else %}
+            {% set var = "/"%}
+            {% endif %}
         <div class="header-container">
             <header class="wrapper clearfix">
-                <a href="/">
+                <a href="{{var}}">
                     <h1 class="title">{% block title %}{% endblock %}</h1>
                 </a>
                 {% if session['Username'] %}
